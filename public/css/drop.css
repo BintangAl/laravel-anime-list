@@ -1,0 +1,59 @@
+.box-avatar {
+    width: 230px;
+    height: 230px;
+    background-color: #F8F9FA;
+}
+
+.box-banner {
+    height: 230px;
+    background-color: #F8F9FA;
+}
+
+.drag-area-avatar, .drag-area-banner {
+    height: 230px;
+    border: 3px dashed #e0eafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin: 10px auto;
+}
+
+h3 {
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.drag-area-avatar .icon, .drag-area-banner .icon {
+    font-size: 50px;
+    color: #ddd;
+}
+
+.drag-area-avatar .header-avatar, .drag-area-banner .header-banner {
+    font-size: 20px;
+    font-weight: 500;
+    color: #34495e;
+}
+
+.drag-area-avatar .support, .drag-area-banner .support {
+    font-size: 12px;
+    color: gray;
+    margin: 10px 0 15px 0;
+}
+
+.drag-area-avatar .button-avatar, .drag-area-banner .button-banner {
+    font-size: 20px;
+    font-weight: 500;
+    color: #1683ff;
+    cursor: pointer;
+}
+
+.drag-area-avatar.active, .drag-area-banner.active {
+    border: 2px solid #1683ff;
+}
+
+.drag-area-avatar img, .drag-area-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
