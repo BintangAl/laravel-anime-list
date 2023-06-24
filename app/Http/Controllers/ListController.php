@@ -14,14 +14,14 @@ class ListController extends Controller
     {
         $api = new ApiController();
         $genres = json_decode($api->genre());
-        $get_top_anime = json_decode($api->TopAnime(page: 1));
-        $image = '';
+        // $get_top_anime = json_decode($api->TopAnime(page: 1));
+        // $image = '';
 
-        if ($get_top_anime) {
-            foreach (array_slice($get_top_anime->data, 1, 6) as $top_anime) {
-                $image .= $top_anime->entry->mal_id . ',' . json_decode($api->AnimeDetail($top_anime->entry->mal_id))->data->images->webp->large_image_url . '#';
-            }
-        }
+        // if ($get_top_anime) {
+        //     foreach (array_slice($get_top_anime->data, 1, 6) as $top_anime) {
+        //         $image .= $top_anime->entry->mal_id . ',' . json_decode($api->AnimeDetail($top_anime->entry->mal_id))->data->images->webp->large_image_url . '#';
+        //     }
+        // }
 
         return view('home')
             ->with([
@@ -29,8 +29,8 @@ class ListController extends Controller
                 'genres' => $genres ? $genres->data : [],
                 'forbidden_genre' => $api->ForbiddenGenre(),
                 'all_anime' => json_decode($api->GetAnime(url: 'https://api.jikan.moe/v4/top/anime?filter=bypopularity', page: 1, limit: 6))->data,
-                'top_anime' => $get_top_anime ? array_slice($get_top_anime->data, 1, 6) : [],
-                'top_image' => explode('#', $image),
+                // 'top_anime' => $get_top_anime ? array_slice($get_top_anime->data, 1, 6) : [],
+                // 'top_image' => explode('#', $image),
                 'this_season_anime' => json_decode($api->GetAnime(url: 'https://api.jikan.moe/v4/seasons/now?', page: 1, limit: 6))->data,
                 'next_season_anime' => json_decode($api->GetAnime(url: 'https://api.jikan.moe/v4/seasons/upcoming?', page: 1, limit: 6))->data,
             ]);
