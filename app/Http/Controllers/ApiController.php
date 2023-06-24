@@ -6,12 +6,35 @@ use Illuminate\Http\Request;
 
 class ApiController extends Controller
 {
-    public function AllAnime($page)
+    public function GetAnime($url, $page = false, $limit = false)
     {
         // get all popular
+        $qpage = '&page=' . $page;
+        $qlimit = '&limit=' . $limit;
+
+        $get_anime = curl_init();
+        curl_setopt_array($get_anime, array(
+            CURLOPT_URL => $url . (!empty($page) ? $qpage : '') . (!empty($limit) ? $qlimit : ''),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+        ));
+        $response_get_anime = curl_exec($get_anime);
+        curl_close($get_anime);
+
+        return $response_get_anime;
+    }
+
+    public function TopAnime($page)
+    {
+        // get top anime list
         $top_anime = curl_init();
         curl_setopt_array($top_anime, array(
-            CURLOPT_URL => 'https://api.jikan.moe/v4/top/anime?filter=bypopularity&page=' . $page,
+            CURLOPT_URL => 'https://api.jikan.moe/v4/watch/episodes/popular',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -197,66 +220,6 @@ class ApiController extends Controller
         curl_close($recomended);
 
         return $response_recomended;
-    }
-
-    public function TopAnime($page)
-    {
-        // get top anime list
-        $top_anime = curl_init();
-        curl_setopt_array($top_anime, array(
-            CURLOPT_URL => 'https://api.jikan.moe/v4/watch/episodes/popular',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-        $response_top_anime = curl_exec($top_anime);
-        curl_close($top_anime);
-
-        return $response_top_anime;
-    }
-
-    public function ThisSeason($page)
-    {
-        // get populer this seasons anime list
-        $this_season_anime = curl_init();
-        curl_setopt_array($this_season_anime, array(
-            CURLOPT_URL => 'https://api.jikan.moe/v4/seasons/now?page=' . $page,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-        $response_this_season_anime = curl_exec($this_season_anime);
-        curl_close($this_season_anime);
-
-        return $response_this_season_anime;
-    }
-
-    public function NextSeason($page)
-    {
-        // get populer next seasons anime list
-        $next_season_anime = curl_init();
-        curl_setopt_array($next_season_anime, array(
-            CURLOPT_URL => 'https://api.jikan.moe/v4/seasons/upcoming?page=' . $page,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-        $response_next_season_anime = curl_exec($next_season_anime);
-        curl_close($next_season_anime);
-
-        return $response_next_season_anime;
     }
 
     public function Search($search, $genres)
