@@ -47,12 +47,13 @@ Route::get('/search-list', [UserController::class, 'searchList'])->middleware('a
 // Profile Favorite
 Route::get('/profile/favorite/{genre}', function ($genre) {
     $api = new ApiController();
+    $genres = json_decode($api->genre());
 
     return view('user.favorite')
         ->with([
             'title' => "Profile - Favorite",
             'genre' => $genre,
-            'genres' => json_decode($api->genre())->data,
+            'genres' => $genres ? $genres->data : [],
             'favorite' => AnimeFavorite::where([['user_id', '=', auth()->user()->id], ['genre', 'Like', '%' . $genre . '%']])->get()
         ]);
 });

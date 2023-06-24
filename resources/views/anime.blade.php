@@ -4,7 +4,9 @@
 @include('partials.navbar')
 
 <div class="container my-5">
-    @include('partials.filter')
+    @if ($genres)
+        @include('partials.filter')
+    @endif
 
     <div class="overpass d-none" id="search-view">
         <div class="fs-5 mb-2 text-gray fw-bold text-uppercase" id="keyword"></div>

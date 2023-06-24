@@ -13,6 +13,7 @@ class ListController extends Controller
     public function index()
     {
         $api = new ApiController();
+        $genres = json_decode($api->genre());
         $get_top_anime = json_decode($api->TopAnime(page: 1));
         $image = '';
 
@@ -25,7 +26,7 @@ class ListController extends Controller
         return view('home')
             ->with([
                 'title' => 'home',
-                'genres' => json_decode($api->genre())->data,
+                'genres' => $genres ? $genres->data : [],
                 'forbidden_genre' => $api->ForbiddenGenre(),
                 'all_anime' => json_decode($api->GetAnime(url: 'https://api.jikan.moe/v4/top/anime?filter=bypopularity', page: 1, limit: 6))->data,
                 'top_anime' => $get_top_anime ? array_slice($get_top_anime->data, 1, 6) : [],
@@ -73,12 +74,12 @@ class ListController extends Controller
     public function AnimeList()
     {
         $api = new ApiController();
-
+        $genres = json_decode($api->genre());
         $get_anime_list = $api->GetAnime(url: 'https://api.jikan.moe/v4/top/anime?filter=bypopularity', page: request('page'));
 
         return view('anime')
             ->with([
-                'genres' => json_decode($api->genre())->data,
+                'genres' => $genres ? $genres->data : [],
                 'forbidden_genre' => $api->ForbiddenGenre(),
                 'title' => 'ALL TIME POPULAR',
                 'data' => json_decode($get_anime_list)->data,
@@ -89,6 +90,7 @@ class ListController extends Controller
     public function Anime($data)
     {
         $api = new ApiController();
+        $genres = json_decode($api->genre());
 
         if ($data == 'top') {
             $image = '';
@@ -102,7 +104,7 @@ class ListController extends Controller
 
             return view('anime')
                 ->with([
-                    'genres' => json_decode($api->genre())->data,
+                    'genres' => $genres ? $genres->data : [],
                     'forbidden_genre' => $api->ForbiddenGenre(),
                     'title' => $title,
                     'data' => $data,
@@ -123,7 +125,7 @@ class ListController extends Controller
 
         return view('anime')
             ->with([
-                'genres' => json_decode($api->genre())->data,
+                'genres' => $genres ? $genres->data : [],
                 'forbidden_genre' => $api->ForbiddenGenre(),
                 'title' => $title,
                 'data' => $data,
@@ -134,12 +136,13 @@ class ListController extends Controller
     public function Genre($id, $genre)
     {
         $api = new ApiController();
+        $genres = json_decode($api->genre());
 
         if (!in_array($id, $api->ForbiddenGenre())) {
             return view('genres')
                 ->with([
                     'title' => 'genre',
-                    'genres' => json_decode($api->genre())->data,
+                    'genres' => $genres ? $genres->data : [],
                     'forbidden_genre' => $api->ForbiddenGenre(),
                     'this_genre' => $genre,
                     'filter_genre' => json_decode($api->FilterGenre($id))->data,

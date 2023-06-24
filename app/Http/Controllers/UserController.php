@@ -115,12 +115,13 @@ class UserController extends Controller
     public function favorite()
     {
         $api = new ApiController();
+        $genres = json_decode($api->genre());
 
         return view('user.favorite')
             ->with([
                 'title' => "Profile - Favorite",
                 'genre' => 'all',
-                'genres' => json_decode($api->genre())->data,
+                'genres' => $genres ? $genres->data : [],
                 'forbidden_genre' => $api->ForbiddenGenre(),
                 'favorite' => AnimeFavorite::where('user_id', auth()->user()->id)->get()
             ]);
