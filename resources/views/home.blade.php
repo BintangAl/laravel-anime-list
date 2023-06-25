@@ -16,7 +16,7 @@
     </div>
 
     <div class="list-view">
-        {{-- <div class="row overpass mb-4">
+        <div class="row overpass mb-4">
             <div class="fs-5 mb-2 d-flex justify-content-between align-items-center">
                 <a href="{{ url('/anime/top') }}" class="text-gray fw-bold">TOP ANIME</a>
                 <a href="{{ url('/anime/top') }}" class="text-gray fs-small text-hover-blue">view all <i class="fa-solid fa-circle-right"></i></a>
@@ -33,7 +33,7 @@
                 </a>
             </div>
             @endforeach
-        </div> --}}
+        </div>
     
         <div class="row overpass mb-4">
             <div class="fs-5 mb-2 d-flex justify-content-between align-items-center">

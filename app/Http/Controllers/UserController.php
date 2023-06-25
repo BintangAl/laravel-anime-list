@@ -115,7 +115,7 @@ class UserController extends Controller
     public function favorite()
     {
         $api = new ApiController();
-        $genres = json_decode($api->genre());
+        $genres = $api->genre();
 
         return view('user.favorite')
             ->with([

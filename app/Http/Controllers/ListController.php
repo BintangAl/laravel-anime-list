@@ -13,26 +13,25 @@ class ListController extends Controller
     public function index()
     {
         $api = new ApiController();
-        $genres = json_decode($api->genre());
-        // $get_top_anime = json_decode($api->TopAnime(page: 1));
-        // $image = '';
+        $genres = $api->genre();
+        $get_top_anime = $api->TopAnime(page: 1);
+        $image = '';
 
-        // if ($get_top_anime) {
-        //     foreach (array_slice($get_top_anime->data, 1, 6) as $top_anime) {
-        //         $image .= $top_anime->entry->mal_id . ',' . json_decode($api->AnimeDetail($top_anime->entry->mal_id))->data->images->webp->large_image_url . '#';
-        //     }
-        // }
-
+        if ($get_top_anime) {
+            foreach (array_slice($get_top_anime->data, 1, 6) as $top_anime) {
+                $image .= $top_anime->entry->mal_id . ',' . $api->AnimeDetail($top_anime->entry->mal_id)->data->images->webp->large_image_url . '#';
+            }
+        }
         return view('home')
             ->with([
                 'title' => 'home',
-                'genres' => $genres ? $genres->data : [],
+                'genres' => $genres->data,
                 'forbidden_genre' => $api->ForbiddenGenre(),
-                'all_anime' => json_decode($api->GetAnime(url: 'https://api.jikan.moe/v4/top/anime?filter=bypopularity', page: 1, limit: 6))->data,
-                // 'top_anime' => $get_top_anime ? array_slice($get_top_anime->data, 1, 6) : [],
-                // 'top_image' => explode('#', $image),
-                'this_season_anime' => json_decode($api->GetAnime(url: 'https://api.jikan.moe/v4/seasons/now?', page: 1, limit: 6))->data,
-                'next_season_anime' => json_decode($api->GetAnime(url: 'https://api.jikan.moe/v4/seasons/upcoming?', page: 1, limit: 6))->data,
+                'all_anime' => $api->GetAnime(url: 'https://api.jikan.moe/v4/top/anime?filter=bypopularity', page: 1, limit: 6)->data,
+                'top_anime' => $get_top_anime ? array_slice($get_top_anime->data, 1, 6) : [],
+                'top_image' => explode('#', $image),
+                'this_season_anime' => $api->GetAnime(url: 'https://api.jikan.moe/v4/seasons/now?', page: 1, limit: 6)->data,
+                'next_season_anime' => $api->GetAnime(url: 'https://api.jikan.moe/v4/seasons/upcoming?', page: 1, limit: 6)->data,
             ]);
     }
 
@@ -40,7 +39,7 @@ class ListController extends Controller
     {
         $genre = '';
         $api = new ApiController();
-        $data = json_decode($api->Search(str_replace(' ', '%20', $request->search), $request->genres));
+        $data = $api->Search(str_replace(' ', '%20', $request->search), $request->genre);
         $output = '';
 
         foreach ($data->data as $key => $value) {
@@ -74,7 +73,7 @@ class ListController extends Controller
     public function AnimeList()
     {
         $api = new ApiController();
-        $genres = json_decode($api->genre());
+        $genres = $api->genre();
         $get_anime_list = $api->GetAnime(url: 'https://api.jikan.moe/v4/top/anime?filter=bypopularity', page: request('page'));
 
         return view('anime')
@@ -90,17 +89,18 @@ class ListController extends Controller
     public function Anime($data)
     {
         $api = new ApiController();
-        $genres = json_decode($api->genre());
+        $genres = $api->genre();
 
         if ($data == 'top') {
             $image = '';
-            foreach (json_decode($api->TopAnime('page'))->data as $key => $value) {
-                $image .= $value->entry->mal_id . ',' . json_decode($api->AnimeDetail($value->entry->mal_id))->data->images->webp->large_image_url . '#';
+            $get_top_anime = $api->TopAnime(request('page'));
+            foreach ($get_top_anime->data as $top_anime) {
+                $image .= $top_anime->entry->mal_id . ',' . $api->AnimeDetail($top_anime->entry->mal_id)->data->images->webp->large_image_url . '#';
             }
 
             $title = "TOP ANIME";
-            $data = json_decode($api->TopAnime(request('page')))->data;
-            $pagination = $api->Pagination(request('page'), $api->TopAnime(1))[0];
+            $data = $get_top_anime->data;
+            $pagination = $api->Pagination(request('page'), $get_top_anime)[0];
 
             return view('anime')
                 ->with([
@@ -113,13 +113,11 @@ class ListController extends Controller
                 ]);
         } elseif ($data == 'this-season') {
             $title = "POPULAR THIS SEASON";
-            $get_this_season = $api->GetAnime(url: 'https://api.jikan.moe/v4/seasons/now?', page: request('page'));
-            $data = json_decode($get_this_season)->data;
+            $get_this_season = $api->GetAnime(url: 'https://api.jikan.moe/v4/seasons/now?', page: request('page'))->data;
             $pagination = $api->Pagination(request('page'), $get_this_season)[0];
         } elseif ($data == 'next-season') {
             $title = "POPULAR NEXT SEASON";
-            $get_next_season = $api->GetAnime(url: 'https://api.jikan.moe/v4/seasons/upcoming?', page: request('page'));
-            $data = json_decode($get_next_season)->data;
+            $get_next_season = $api->GetAnime(url: 'https://api.jikan.moe/v4/seasons/upcoming?', page: request('page'))->data;
             $pagination = $api->Pagination(request('page'), $get_next_season)[0];
         }
 
@@ -136,7 +134,8 @@ class ListController extends Controller
     public function Genre($id, $genre)
     {
         $api = new ApiController();
-        $genres = json_decode($api->genre());
+        $genres = $api->genre();
+        $get_anime_filter_genre = $api->FilterGenre($id, search: request('search') ?: '', page: request('page'));
 
         if (!in_array($id, $api->ForbiddenGenre())) {
             return view('genres')
@@ -145,8 +144,8 @@ class ListController extends Controller
                     'genres' => $genres ? $genres->data : [],
                     'forbidden_genre' => $api->ForbiddenGenre(),
                     'this_genre' => $genre,
-                    'filter_genre' => json_decode($api->FilterGenre($id))->data,
-                    'pagination' => $api->Pagination(request('page'), $api->FilterGenre(1))[0]
+                    'filter_genre' => $get_anime_filter_genre->data,
+                    'pagination' => $api->Pagination(request('page'), $get_anime_filter_genre)[0]
                 ]);
         } else {
             abort(404);
@@ -159,30 +158,30 @@ class ListController extends Controller
 
         // Forbidden Genre
         $genre = '';
-        foreach (json_decode($api->AnimeDetail($id))->data->genres as $key => $value) {
+        foreach ($api->AnimeDetail($id)->data->genres as $key => $value) {
             $genre .= $value->name . '#';
         }
 
         $list = '';
         $fav = '';
         if (Auth::check()) {
-            $list = AnimeList::where(['user_id' => auth()->user()->id, 'anime_id' => json_decode($api->AnimeDetail($id))->data->mal_id])->first();
-            $fav = AnimeFavorite::where(['user_id' => auth()->user()->id, 'anime_id' => json_decode($api->AnimeDetail($id))->data->mal_id])->first();
+            $list = AnimeList::where(['user_id' => auth()->user()->id, 'anime_id' => $api->AnimeDetail($id)->data->mal_id])->first();
+            $fav = AnimeFavorite::where(['user_id' => auth()->user()->id, 'anime_id' => $api->AnimeDetail($id)->data->mal_id])->first();
         }
 
         if (!array_intersect(explode('#', $genre), $api->ForbiddenGenre())) {
-            $char = json_decode($api->AnimeCharacter($id))->data;
+            $char = $api->AnimeCharacter($id)->data;
             return view('detail.overview')
                 ->with([
                     'title' => 'detail',
                     'list' => $list,
                     'fav' => $fav,
-                    'detail' => json_decode($api->AnimeDetail($id))->data,
+                    'detail' => $api->AnimeDetail($id)->data,
                     'characters' => isset($char) ? array_slice($char, 0, 6) : null,
-                    'staff' => array_slice(json_decode($api->AnimeStaff($id))->data, 0, 4),
-                    'statistics' => json_decode($api->AnimeStatistics($id))->data,
-                    'recomended' => array_slice(json_decode($api->recomended($id))->data, 0, 6),
-                    'videos' => array_slice(json_decode($api->Watch($id))->data->episodes, 0, 6),
+                    'staff' => array_slice($api->AnimeStaff($id)->data, 0, 4),
+                    'statistics' => $api->AnimeStatistics($id)->data,
+                    'recomended' => array_slice($api->Recomended($id)->data, 0, 6),
+                    'videos' => array_slice($api->Watch($id)->data->episodes, 0, 6),
                 ]);
         } else {
             return abort(404);
@@ -194,13 +193,13 @@ class ListController extends Controller
         $api = new ApiController();
         $output = '';
 
-        foreach (json_decode($api->AnimeRelations($request->id))->data as $key => $rel) {
+        foreach ($api->AnimeRelations($request->id)->data as $key => $rel) {
             if ($rel->relation != 'Adaptation') {
                 foreach ($rel->entry as $item) {
                     $output .= '
                     <div class="me-2" title="' . $item->name . '" style="width: 120px">
                         <a href="' . url('anime/' . $item->mal_id . '/' . str_replace(' ', '_', $item->name)) . '" onclick="load()" class="box-anime bg-white" style="overflow: hidden">
-                            <img src="' . json_decode($api->AnimeDetail($item->mal_id))->data->images->webp->large_image_url . '" class="img-fluid mb-2" style="height: 150px; object-fit:cover">
+                            <img src="' . $api->AnimeDetail($item->mal_id)->data->images->webp->large_image_url . '" class="img-fluid mb-2" style="height: 150px; object-fit:cover">
                             <div class="text-gray fw-bold fs-small text-truncate" style="width: 120px">' . $item->name . '</div>
                         </a>
                     </div>
@@ -221,26 +220,27 @@ class ListController extends Controller
         $list = '';
         $fav = '';
         if (Auth::check()) {
-            $list = AnimeList::where(['user_id' => auth()->user()->id, 'anime_id' => json_decode($api->AnimeDetail($id))->data->mal_id])->first();
-            $fav = AnimeFavorite::where(['user_id' => auth()->user()->id, 'anime_id' => json_decode($api->AnimeDetail($id))->data->mal_id])->first();
+            $list = AnimeList::where(['user_id' => auth()->user()->id, 'anime_id' => $api->AnimeDetail($id)->data->mal_id])->first();
+            $fav = AnimeFavorite::where(['user_id' => auth()->user()->id, 'anime_id' => $api->AnimeDetail($id)->data->mal_id])->first();
         }
 
         // Forbidden Genre
         $genre = '';
-        foreach (json_decode($api->AnimeDetail($id))->data->genres as $key => $value) {
+        foreach ($api->AnimeDetail($id)->data->genres as $key => $value) {
             $genre .= $value->name . '#';
         }
 
         if (!array_intersect(explode('#', $genre), $api->ForbiddenGenre())) {
             if ($menu == 'watch') {
+                $get_anime_videos = $api->AnimeVideos($id, (request('page')) ?: 1);
                 return view('detail.watch')
                     ->with([
                         'title' => 'watch',
                         'list' => $list,
                         'fav' => $fav,
-                        'detail' => json_decode($api->AnimeDetail($id))->data,
-                        'videos' => json_decode($api->AnimeVideos($id, (request('page')) ?: 1))->data,
-                        'pagination' => $api->Pagination(request('page'), $api->AnimeVideos($id, 1))[0]
+                        'detail' => $api->AnimeDetail($id)->data,
+                        'videos' => $get_anime_videos->data,
+                        'pagination' => $api->Pagination(request('page'), $get_anime_videos)[0]
                     ]);
             } else if ($menu == 'character') {
                 return view('detail.character')
@@ -248,8 +248,8 @@ class ListController extends Controller
                         'title' => 'character',
                         'list' => $list,
                         'fav' => $fav,
-                        'detail' => json_decode($api->AnimeDetail($id))->data,
-                        'characters' => json_decode($api->AnimeCharacter($id))->data,
+                        'detail' => $api->AnimeDetail($id)->data,
+                        'characters' => $api->AnimeCharacter($id)->data,
                     ]);
             } else if ($menu == 'staff') {
                 return view('detail.staff')
@@ -257,8 +257,8 @@ class ListController extends Controller
                         'title' => 'staff',
                         'list' => $list,
                         'fav' => $fav,
-                        'detail' => json_decode($api->AnimeDetail($id))->data,
-                        'staff' => json_decode($api->AnimeStaff($id))->data,
+                        'detail' => $api->AnimeDetail($id)->data,
+                        'staff' => $api->AnimeStaff($id)->data,
                     ]);
             }
         } else {

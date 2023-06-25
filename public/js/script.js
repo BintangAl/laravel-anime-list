@@ -45,10 +45,12 @@ $("input[name=search]").change(function (e) {
 
     $.ajax({
         type: "get",
-        url: "search",
-        data: { "search":$value },
+        url: window.location.origin + "/search",
+        data: { 
+            "search":$value,
+            "genre": $('#filterByGenre').find(":selected").data().id 
+        },
         success: function (response) {
-            console.log(response);
             if($value != '') {
                 $("#keyword").removeClass("d-none");
                 $("#keyword").html("search : " + response.search);
