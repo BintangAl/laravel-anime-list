@@ -15,14 +15,14 @@
         </div>
         <div class="col-3">
             <label for="genres" class="fw-bold text-gray">Genres</label>
-            <select class="form-select shadow-none border fs-small fw-bold text-gray" aria-label="Default select example" onchange="window.location=this.value, load()">
+            <select class="form-select shadow-none border fs-small fw-bold text-gray" id="filterByGenre" aria-label="Default select example" onchange="window.location=this.value, load()">
                 <option value="{{ url('anime') }}">All</option>
                 @foreach ($genres as $genre)
                     @if (!in_array($genre->name, $forbidden_genre))
                         @if (strtolower($genre->name) == $this_genre)
-                        <option value="{{ url('genre/'. $genre->mal_id .'/'.strtolower($genre->name)) }}" class="fw-bold" selected>{{ $genre->name }}</option>                   
+                        <option value="{{ url('genre/'. $genre->mal_id .'/'.strtolower($genre->name)) }}" data-id="{{ $genre->mal_id }}" class="fw-bold" selected>{{ $genre->name }}</option>                   
                         @else
-                        <option value="{{ url('genre/'. $genre->mal_id .'/'.strtolower($genre->name)) }}" class="fw-bold">{{ $genre->name }}</option>                   
+                        <option value="{{ url('genre/'. $genre->mal_id .'/'.strtolower($genre->name)) }}" data-id="{{ $genre->mal_id }}" class="fw-bold">{{ $genre->name }}</option>                   
                         @endif
                     @endif
                 @endforeach
@@ -50,6 +50,10 @@
             </div>
             @endforeach
         </div>
+
+        @if ($pagination['all_page'] != 1)
+            @include('partials.pagination')
+        @endif
     </div>
 </div>
 

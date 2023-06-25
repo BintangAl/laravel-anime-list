@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 
 class ApiController extends Controller
 {
@@ -12,260 +13,93 @@ class ApiController extends Controller
         $qpage = '&page=' . $page;
         $qlimit = '&limit=' . $limit;
 
-        $get_anime = curl_init();
-        curl_setopt_array($get_anime, array(
-            CURLOPT_URL => $url . (!empty($page) ? $qpage : '') . (!empty($limit) ? $qlimit : ''),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-        $response_get_anime = curl_exec($get_anime);
-        curl_close($get_anime);
-
-        return $response_get_anime;
+        $respone = Http::get($url . (!empty($page) ? $qpage : '') . (!empty($limit) ? $qlimit : ''));
+        return $respone->successful() ? json_decode($respone->body()) : [];
     }
 
     public function TopAnime($page)
     {
         // get top anime list
-        $top_anime = curl_init();
-        curl_setopt_array($top_anime, array(
-            CURLOPT_URL => 'https://api.jikan.moe/v4/watch/episodes/popular',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-        $response_top_anime = curl_exec($top_anime);
-        curl_close($top_anime);
-
-        return $response_top_anime;
+        $respone = Http::get('https://api.jikan.moe/v4/watch/episodes/popular');
+        return $respone->successful() ? json_decode($respone->body()) : [];
     }
 
     public function genre()
     {
         // get genre list
-        $genres = curl_init();
-        curl_setopt_array($genres, array(
-            CURLOPT_URL => 'https://api.jikan.moe/v4/genres/anime',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-        $response_genre = curl_exec($genres);
-        curl_close($genres);
-
-        return $response_genre;
+        $respone = Http::get('https://api.jikan.moe/v4/genres/anime');
+        return $respone->successful() ? json_decode($respone->body()) : json_decode('{"data": []}');
     }
 
     public function AnimeDetail($id)
     {
-        $detail = curl_init();
-        curl_setopt_array($detail, array(
-            CURLOPT_URL => 'https://api.jikan.moe/v4/anime/' . $id . '/full',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-        $response_detail = curl_exec($detail);
-        curl_close($detail);
-
-        return $response_detail;
+        $respone = Http::get('https://api.jikan.moe/v4/anime/' . $id . '/full');
+        return $respone->successful() ? json_decode($respone->body()) : json_decode('{"data": []}');
     }
 
     public function AnimeCharacter($id)
     {
-        $characters = curl_init();
-        curl_setopt_array($characters, array(
-            CURLOPT_URL => 'https://api.jikan.moe/v4/anime/' . $id . '/characters',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-        $response_characters = curl_exec($characters);
-        curl_close($characters);
-
-        return $response_characters;
+        $respone = Http::get('https://api.jikan.moe/v4/anime/' . $id . '/characters');
+        return $respone->successful() ? json_decode($respone->body()) : json_decode('{"data": []}');
     }
 
     public function AnimeStaff($id)
     {
-        $staff = curl_init();
-        curl_setopt_array($staff, array(
-            CURLOPT_URL => 'https://api.jikan.moe/v4/anime/' . $id . '/staff',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-        $response_staff = curl_exec($staff);
-        curl_close($staff);
-
-        return $response_staff;
+        $respone = Http::get('https://api.jikan.moe/v4/anime/' . $id . '/staff');
+        return $respone->successful() ? json_decode($respone->body()) : json_decode('{"data": []}');
     }
 
     public function AnimeStatistics($id)
     {
-        $statistics = curl_init();
-        curl_setopt_array($statistics, array(
-            CURLOPT_URL => 'https://api.jikan.moe/v4/anime/' . $id . '/statistics',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-        $response_statistics = curl_exec($statistics);
-        curl_close($statistics);
-
-        return $response_statistics;
-    }
-
-    public function AnimeVideos($id, $page)
-    {
-        $videos = curl_init();
-        curl_setopt_array($videos, array(
-            CURLOPT_URL => 'https://api.jikan.moe/v4/anime/' . $id . '/videos/episodes?page=' . $page,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-        $response_videos = curl_exec($videos);
-        curl_close($videos);
-
-        return $response_videos;
+        $respone = Http::get('https://api.jikan.moe/v4/anime/' . $id . '/statistics');
+        return $respone->successful() ? json_decode($respone->body()) : json_decode('{"data": []}');
     }
 
     public function Watch($id)
     {
-        $watch = curl_init();
-        curl_setopt_array($watch, array(
-            CURLOPT_URL => 'https://api.jikan.moe/v4/anime/' . $id . '/videos',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-        $response_watch = curl_exec($watch);
-        curl_close($watch);
+        $respone = Http::get('https://api.jikan.moe/v4/anime/' . $id . '/videos');
+        return $respone->successful() ? json_decode($respone->body()) : json_decode('{"data": []}');
+    }
 
-        return $response_watch;
+    public function AnimeVideos($id, $page)
+    {
+        $respone = Http::get('https://api.jikan.moe/v4/anime/' . $id . '/videos/episodes?page=' . $page);
+        return $respone->successful() ? json_decode($respone->body()) : [];
     }
 
     public function AnimeRelations($id)
     {
-        $relations = curl_init();
-        curl_setopt_array($relations, array(
-            CURLOPT_URL => 'https://api.jikan.moe/v4/anime/' . $id . '/relations',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-        $response_relations = curl_exec($relations);
-        curl_close($relations);
-
-        return $response_relations;
+        $respone = Http::get('https://api.jikan.moe/v4/anime/' . $id . '/relations');
+        return $respone->successful() ? json_decode($respone->body()) : json_decode('{"data": []}');
     }
 
-    public function recomended($id)
+    public function Recomended($id)
     {
         // recomended anime list
-        $recomended = curl_init();
-        curl_setopt_array($recomended, array(
-            CURLOPT_URL => 'https://api.jikan.moe/v4/anime/' . $id . '/recommendations',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-        $response_recomended = curl_exec($recomended);
-        curl_close($recomended);
-
-        return $response_recomended;
+        $respone = Http::get('https://api.jikan.moe/v4/anime/' . $id . '/recommendations');
+        return $respone->successful() ? json_decode($respone->body()) : json_decode('{"data": []}');
     }
 
     public function Search($search, $genres)
     {
         // get search anime list
-        $filter_search = curl_init();
-        curl_setopt_array($filter_search, array(
-            CURLOPT_URL => 'https://api.jikan.moe/v4/anime?q=' . $search . '&genres=' . $genres,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-        $response_filter_search = curl_exec($filter_search);
-        curl_close($filter_search);
-
-        return $response_filter_search;
+        $respone = Http::get('https://api.jikan.moe/v4/anime?q=' . $search . '&genres=' . $genres);
+        return $respone->successful() ? json_decode($respone->body()) : [];
     }
 
-    public function FilterGenre($id)
+    public function FilterGenre($id, $search = false, $page = 1)
     {
         // get filter genre anime list
-        $filter_genre = curl_init();
-        curl_setopt_array($filter_genre, array(
-            CURLOPT_URL => 'https://api.jikan.moe/v4/anime?genres=' . $id,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-        ));
-        $response_filter_genre = curl_exec($filter_genre);
-        curl_close($filter_genre);
-
-        return $response_filter_genre;
+        $qpage = '&page=' . $page;
+        $qsearch = '&search=' . $search;
+        $respone = Http::get('https://api.jikan.moe/v4/anime?genres=' . $id . (!empty($search) ? $qsearch : '') . (!empty($page) ? $qpage : ''));
+        return $respone->successful() ? json_decode($respone->body()) : [];
     }
 
     public function Pagination($page, $list)
     {
         $current_page = isset($page) ? $page : 1;
-        $all_page = json_decode($list)->pagination->last_visible_page;
+        $all_page = $list->pagination->last_visible_page;
         $before = ($page <= $all_page) ? (int)$current_page - 1 : abort(404);
         $after = ($page <= $all_page) ? (int)$current_page + 1 : abort(404);
 
