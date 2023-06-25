@@ -81,7 +81,7 @@ class ListController extends Controller
                 'genres' => $genres ? $genres->data : [],
                 'forbidden_genre' => $api->ForbiddenGenre(),
                 'title' => 'ALL TIME POPULAR',
-                'data' => json_decode($get_anime_list)->data,
+                'data' => $get_anime_list->data,
                 'pagination' => $api->Pagination(request('page'), $get_anime_list)[0]
             ]);
     }
@@ -113,11 +113,13 @@ class ListController extends Controller
                 ]);
         } elseif ($data == 'this-season') {
             $title = "POPULAR THIS SEASON";
-            $get_this_season = $api->GetAnime(url: 'https://api.jikan.moe/v4/seasons/now?', page: request('page'))->data;
+            $get_this_season = $api->GetAnime(url: 'https://api.jikan.moe/v4/seasons/now?', page: request('page'));
+            $data = $get_this_season->data;
             $pagination = $api->Pagination(request('page'), $get_this_season)[0];
         } elseif ($data == 'next-season') {
             $title = "POPULAR NEXT SEASON";
-            $get_next_season = $api->GetAnime(url: 'https://api.jikan.moe/v4/seasons/upcoming?', page: request('page'))->data;
+            $get_next_season = $api->GetAnime(url: 'https://api.jikan.moe/v4/seasons/upcoming?', page: request('page'));
+            $data = $get_next_season->data;
             $pagination = $api->Pagination(request('page'), $get_next_season)[0];
         }
 
